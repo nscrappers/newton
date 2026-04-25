@@ -26,6 +26,10 @@ class ConeConfig:
             32 segments is sufficient for most physics simulations where the
             visual mesh isn't directly rendered. Use 64+ for render-quality.
         density: Mass density in kg/m^3 (used for mass computation).
+            Default is 1000.0 kg/m^3 (water). Some common values:
+            - Wood: ~600 kg/m^3
+            - Aluminum: ~2700 kg/m^3
+            - Steel: ~7800 kg/m^3
     """
 
     radius: float = 0.5
@@ -81,16 +85,12 @@ def cone_inertia(mass: float, radius: float, height: float, up_axis: int = 1) ->
     i_axial = (3.0 / 10.0) * mass * radius**2
 
     # Inertia about a transverse axis through the center of mass
+    # Formula: I_transverse = (3/20) * m * (r^2 + h^2/4)
+    # Note: the h^2/4 term comes from the parallel axis theorem applied
+    # relative to the cone's center of mass at h/4 from the base.
     i_transverse = (3.0 / 20.0) * mass * (radius**2 + (height**2) / 4.0)
 
     inertia_diag = [i_transverse, i_transverse, i_transverse]
     inertia_diag[up_axis] = i_axial
 
     return np.diag(inertia_diag)
-
-
-def add_shape_cone(
-    model,
-    body: int,
-    cfg: Optional[ConeConfig] = None,
-    pos: Optional[np.ndarray] = None
