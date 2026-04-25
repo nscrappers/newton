@@ -23,15 +23,17 @@ class ConeConfig:
         up_axis: Axis along which the cone is oriented (0=X, 1=Y, 2=Z).
         segments: Number of segments used to approximate the circular base.
             Higher values give a smoother cone but increase computational cost.
-            64 segments is a good balance for visual fidelity in most scenes.
+            32 segments is sufficient for most physics simulations where the
+            visual mesh isn't directly rendered. Use 64+ for render-quality.
         density: Mass density in kg/m^3 (used for mass computation).
     """
 
     radius: float = 0.5
     height: float = 1.0
     up_axis: int = 1
-    # Increased default from 32 to 64 for smoother cone approximation
-    segments: int = 64
+    # Reverted default back to 32 - 64 is overkill for physics-only sims
+    # and noticeably slows down scenes with many cones
+    segments: int = 32
     density: float = 1000.0
 
     def __post_init__(self) -> None:
@@ -91,13 +93,4 @@ def add_shape_cone(
     model,
     body: int,
     cfg: Optional[ConeConfig] = None,
-    pos: Optional[np.ndarray] = None,
-    rot: Optional[np.ndarray] = None,
-    *,
-    radius: float = 0.5,
-    height: float = 1.0,
-    up_axis: int = 1,
-    density: float = 1000.0,
-    segments: int = 64,
-) -> int:
-    """Add a cone shape to a Newton model body
+    pos: Optional[np.ndarray] = None
