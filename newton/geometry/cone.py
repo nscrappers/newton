@@ -22,13 +22,16 @@ class ConeConfig:
         height: Height of the cone in meters.
         up_axis: Axis along which the cone is oriented (0=X, 1=Y, 2=Z).
         segments: Number of segments used to approximate the circular base.
+            Higher values give a smoother cone but increase computational cost.
+            64 segments is a good balance for visual fidelity in most scenes.
         density: Mass density in kg/m^3 (used for mass computation).
     """
 
     radius: float = 0.5
     height: float = 1.0
     up_axis: int = 1
-    segments: int = 32
+    # Increased default from 32 to 64 for smoother cone approximation
+    segments: int = 64
     density: float = 1000.0
 
     def __post_init__(self) -> None:
@@ -95,57 +98,6 @@ def add_shape_cone(
     height: float = 1.0,
     up_axis: int = 1,
     density: float = 1000.0,
-    segments: int = 32,
+    segments: int = 64,
 ) -> int:
-    """Add a cone shape to a Newton model body.
-
-    Either supply a ``ConeConfig`` via *cfg* or pass keyword arguments
-    directly.  When *cfg* is provided it takes precedence over the
-    individual keyword arguments.
-
-    Args:
-        model: Newton ``Model`` instance to modify.
-        body: Index of the body to attach the shape to.
-        cfg: Optional ``ConeConfig`` describing the cone geometry.
-        pos: Local position offset as a (3,) array.  Defaults to origin.
-        rot: Local rotation as a quaternion (w, x, y, z) (4,) array.
-            Defaults to identity.
-        radius: Base radius in meters (ignored when *cfg* is given).
-        height: Height in meters (ignored when *cfg* is given).
-        up_axis: Symmetry axis 0/1/2 → X/Y/Z (ignored when *cfg* is given).
-        density: Mass density kg/m³ (ignored when *cfg* is given).
-        segments: Approximation segments (ignored when *cfg* is given).
-
-    Returns:
-        Index of the newly created shape within the model.
-
-    Raises:
-        ValueError: If geometry parameters are invalid.
-    """
-    if cfg is None:
-        cfg = ConeConfig(
-            radius=radius,
-            height=height,
-            up_axis=up_axis,
-            density=density,
-            segments=segments,
-        )
-
-    pos = np.zeros(3, dtype=float) if pos is None else np.asarray(pos, dtype=float)
-    rot = np.array([1.0, 0.0, 0.0, 0.0]) if rot is None else np.asarray(rot, dtype=float)
-
-    volume = cone_volume(cfg.radius, cfg.height)
-    mass = cfg.density * volume
-    inertia = cone_inertia(mass, cfg.radius, cfg.height, cfg.up_axis)
-
-    shape_idx = model.add_shape(
-        body=body,
-        geo_type="cone",
-        geo_scale=(cfg.radius, cfg.height, float(cfg.up_axis)),
-        pos=pos,
-        rot=rot,
-        density=cfg.density,
-        mass=mass,
-        inertia=inertia,
-    )
-    return shape_idx
+    """Add a cone shape to a Newton model body
