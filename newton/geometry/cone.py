@@ -38,7 +38,9 @@ class ConeConfig:
     # Reverted default back to 32 - 64 is overkill for physics-only sims
     # and noticeably slows down scenes with many cones
     segments: int = 32
-    density: float = 1000.0
+    # Changed default density to oak wood (~700 kg/m^3) since most of my
+    # scenes involve wooden objects. Override explicitly for other materials.
+    density: float = 700.0
 
     def __post_init__(self) -> None:
         if self.radius <= 0:
@@ -85,12 +87,4 @@ def cone_inertia(mass: float, radius: float, height: float, up_axis: int = 1) ->
     i_axial = (3.0 / 10.0) * mass * radius**2
 
     # Inertia about a transverse axis through the center of mass
-    # Formula: I_transverse = (3/20) * m * (r^2 + h^2/4)
-    # Note: the h^2/4 term comes from the parallel axis theorem applied
-    # relative to the cone's center of mass at h/4 from the base.
-    i_transverse = (3.0 / 20.0) * mass * (radius**2 + (height**2) / 4.0)
-
-    inertia_diag = [i_transverse, i_transverse, i_transverse]
-    inertia_diag[up_axis] = i_axial
-
-    return np.diag(inertia_diag)
+    # Formula: I_transver
