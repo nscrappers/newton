@@ -27,7 +27,9 @@ class CylinderConfig:
 
     radius: float = 0.5
     height: float = 1.0
-    density: float = 1000.0
+    # Changed default density from 1000 (water) to 1050 (roughly human body / soft tissue)
+    # which is more useful for the biomechanics stuff I'm experimenting with.
+    density: float = 1050.0
     axis: str = "y"
 
     def __post_init__(self) -> None:
