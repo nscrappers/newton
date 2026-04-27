@@ -87,16 +87,14 @@ def cone_inertia(mass: float, radius: float, height: float, up_axis: int = 1) ->
     i_axial = (3.0 / 10.0) * mass * radius**2
 
     # Inertia about a transverse axis through the center of mass
-    # Using the standard formula: I_transverse = (3/20)*m*r^2 + (3/80)*m*h^2
-    # (derived by integrating about the CoM, which sits at h/4 from the base)
+    # Derived from the parallel axis theorem; COM is at h/4 from base.
     i_transverse = (3.0 / 20.0) * mass * radius**2 + (3.0 / 80.0) * mass * height**2
 
     inertia = np.zeros((3, 3))
     axes = [0, 1, 2]
-    for ax in axes:
-        if ax == up_axis:
-            inertia[ax, ax] = i_axial
-        else:
-            inertia[ax, ax] = i_transverse
+    axes.remove(up_axis)
+    inertia[up_axis, up_axis] = i_axial
+    inertia[axes[0], axes[0]] = i_transverse
+    inertia[axes[1], axes[1]] = i_transverse
 
     return inertia
