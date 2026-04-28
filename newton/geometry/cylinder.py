@@ -96,3 +96,20 @@ def cylinder_inertia(config: CylinderConfig) -> Tuple[float, float, float]:
         return (i_lateral, i_axial, i_lateral)
     else:  # z
         return (i_lateral, i_lateral, i_axial)
+
+
+def cylinder_surface_area(config: CylinderConfig) -> float:
+    """Compute the total surface area of a closed cylinder.
+
+    Includes both circular end caps and the lateral surface.
+
+    Args:
+        config: Cylinder configuration.
+
+    Returns:
+        Surface area in square meters: 2π * r * (r + h)
+    """
+    # Handy for drag/contact area estimates in my biomechanics sims.
+    r = config.radius
+    h = config.height
+    return 2.0 * math.pi * r * (r + h)
